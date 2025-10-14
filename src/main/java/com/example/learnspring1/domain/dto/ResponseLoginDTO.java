@@ -11,5 +11,4 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResponseLoginDTO {
     private String accessToken;
-
 }

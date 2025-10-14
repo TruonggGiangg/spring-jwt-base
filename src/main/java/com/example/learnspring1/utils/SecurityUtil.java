@@ -51,4 +51,26 @@ public class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
+    public static java.util.Optional<String> getCurrentUserLogin() {
+        org.springframework.security.core.context.SecurityContext securityContext = org.springframework.security.core.context.SecurityContextHolder.getContext();
+        return java.util.Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
+    }
+
+    private static String extractPrincipal(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        } else if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails springSecurityUser) {
+            return springSecurityUser.getUsername();
+        } else if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
+            // Lấy sub hoặc email từ claim, tuỳ cấu hình token
+            String email = jwt.getClaimAsString("email");
+            if (email == null) {
+                email = jwt.getSubject();
+            }
+            return email;
+        } else if (authentication.getPrincipal() instanceof String s) {
+            return s;
+        }
+        return null;
+    }
 }

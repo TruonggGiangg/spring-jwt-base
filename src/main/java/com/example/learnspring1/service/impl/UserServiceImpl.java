@@ -31,12 +31,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findByIsActiveTrue();
     }
 
     @Override
     public Page<User> getUsersPage(Pageable pageable) {
-        return userRepository.findAll(pageable);
+        return userRepository.findByIsActiveTrue(pageable);
     }
 
     @Override
@@ -54,14 +54,21 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id).map(existing -> {
             existing.setUsername(user.getUsername());
             existing.setEmail(user.getEmail());
-            existing.setPassword(user.getPassword());
+            // KHÔNG cho phép update password qua endpoint này
+            // Dùng endpoint riêng để đổi password
+            if (user.getAvatarUrl() != null) {
+                existing.setAvatarUrl(user.getAvatarUrl());
+            }
             return userRepository.save(existing);
         }).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
     @Override
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new java.util.NoSuchElementException("User not found with id " + id));
+        user.softDelete();
+        userRepository.save(user);
     }
 
     @Override
@@ -71,6 +78,14 @@ public class UserServiceImpl implements UserService {
             return (User) user.get();
         }
         throw new RuntimeException("User not found with email " + email);
+    }
+
+    @Override
+    public User changePassword(Long id, String newPassword, PasswordEncoder encoder) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+        user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
     }
 
 }

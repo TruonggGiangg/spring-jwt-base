@@ -21,17 +21,16 @@ repositories {
 }
 
 dependencies {	
+	// Swagger OpenAPI UI - phiên bản 2.7.0 hỗ trợ Spring Boot 3.5.x
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 	implementation("org.springframework.boot:spring-boot-starter-web")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    
     implementation("org.springframework.boot:spring-boot-starter-data-jpa") 
-    implementation("mysql:mysql-connector-java:8.0.33") 
+	implementation("org.mariadb.jdbc:mariadb-java-client:3.4.0")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-
 	// https://mvnrepository.com/artifact/org.projectlombok/lombok
 	compileOnly("org.projectlombok:lombok:1.18.36")
 	annotationProcessor("org.projectlombok:lombok:1.18.36")
-
 	  // Validation (để Spring quản lý phiên bản, bỏ số version)
     implementation("org.springframework.boot:spring-boot-starter-validation")
 

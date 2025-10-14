@@ -1,9 +1,6 @@
 package com.example.learnspring1.service;
 
-import java.lang.foreign.Linker.Option;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

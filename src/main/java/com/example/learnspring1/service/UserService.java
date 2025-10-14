@@ -25,4 +25,6 @@ public interface UserService {
     User updateUser(Long id, User user);
 
     void deleteUser(Long id);
+    
+    User changePassword(Long id, String newPassword, PasswordEncoder encoder);
 }

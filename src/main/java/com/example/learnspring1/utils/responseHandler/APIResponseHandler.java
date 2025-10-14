@@ -15,7 +15,13 @@ public class APIResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // true = áp dụng cho tất cả response
+        // Loại trừ các endpoint của Swagger/OpenAPI
+        String declaringClassName = returnType.getDeclaringClass().getName();
+        if (declaringClassName.startsWith("org.springdoc") || 
+            declaringClassName.startsWith("springfox.documentation")) {
+            return false;
+        }
+        // true = áp dụng cho tất cả response khác
         return true;
     }
 

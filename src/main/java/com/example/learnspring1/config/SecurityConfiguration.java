@@ -44,7 +44,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
+    JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
     }
 
@@ -54,7 +54,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
                 getSecretKey()).macAlgorithm(JWT_ALGORITHM).build();
         return token -> {
@@ -88,9 +88,22 @@ public class SecurityConfiguration {
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
                 .csrf(c -> c.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/", "/login").permitAll()
+                                .requestMatchers
+                            (
+                                "/",
+                                "/login",
+                                "/register",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                                )
+                                .permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(Customizer
@@ -105,5 +118,24 @@ public class SecurityConfiguration {
                         session -> session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
+
+
+        //      http
+        //     .csrf(c -> c.disable())
+        //     .authorizeHttpRequests(authz -> authz
+        //         .requestMatchers(
+        //             "/",
+        //             "/login",
+        //             "/swagger-ui/**",
+        //             "/swagger-ui.html",
+        //             "/v3/api-docs/**",
+        //             "/api-docs/**",
+        //             "/swagger-resources/**",
+        //             "/webjars/**"
+        //         ).permitAll()
+        //         .anyRequest().permitAll())
+        //     .formLogin(f -> f.disable())
+        //     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // return http.build();
     }
 }

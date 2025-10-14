@@ -1,24 +1,10 @@
-
+   
 package com.example.learnspring1.domain;
-
 import java.time.Instant;
 
 import jakarta.annotation.PreDestroy;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import jakarta.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,33 +13,31 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
 @Entity
-@Table(name = "users")
+@Table(name = "categories")
 @EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "username is required")
-    @Column(nullable = false, length = 50)
-    private String username;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Category parent;
 
-    @NotBlank(message = "email is required")
-    @Column(nullable = false, length = 120)
-    @Email(message = "email should be valid")
-    private String email;
+    @Column(nullable = false, length = 100)
+    private String name;
 
-    @NotBlank(message = "password is required")
-    @Column(nullable = false)
-    private String password;
+    @Column(nullable = false, length = 120, unique = true)
+    private String slug;
 
-    @Column(nullable = true)
-    private String avatarUrl;
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String description;
 
     @Builder.Default
     @Column(name = "is_active", nullable = false)
@@ -62,6 +46,7 @@ public class User {
     @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
+
 
     @Builder.Default
     @Column(name = "updated_at")

@@ -1,3 +1,4 @@
+
 package com.example.learnspring1.utils.error;
 
 import java.util.List;
@@ -6,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,8 +16,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.learnspring1.domain.APIResponse;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.example.learnspring1.controller")
 public class GlobalException {
+
+	// Lỗi đăng nhập sai username/password
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<APIResponse<?>> handleBadCredentials(BadCredentialsException ex) {
+		APIResponse<?> result = new APIResponse<>(HttpStatus.UNAUTHORIZED,
+				"Username hoặc password không đúng", null, ex.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+	}
 
 	// Xử lý tất cả lỗi không xác định
 	@ExceptionHandler(Exception.class)
