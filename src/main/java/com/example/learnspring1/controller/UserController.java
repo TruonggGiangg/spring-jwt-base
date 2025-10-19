@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.learnspring1.domain.User;
+import com.example.learnspring1.domain.dto.UserDTO;
 import com.example.learnspring1.service.UserService;
 import com.example.learnspring1.domain.APIResponse;
 
@@ -49,9 +50,9 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = APIResponse.class)))
     })
     @PostMapping
-    public User createNewUser(@Valid @RequestBody User input) {
+    public UserDTO createNewUser(@Valid @RequestBody User input) {
         User user = this.userService.createUser(input, encoder);
-        return user;
+        return toDTO(user);
     }
 
 
@@ -59,8 +60,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Thành công",
         content = @Content(schema = @Schema(implementation = User.class)))
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserDTO> getAllUsers() {
+        return userService.getAllUsers().stream().map(this::toDTO).toList();
     }
 
 
@@ -68,11 +69,12 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Thành công",
         content = @Content(schema = @Schema(implementation = User.class)))
     @GetMapping("/page")
-    public Page<User> getUsersPage(
+    public Page<UserDTO> getUsersPage(
             @Parameter(description = "Trang hiện tại", example = "1") @RequestParam(name = "page", defaultValue = "1") int page,
-            @Parameter(description = "Số lượng mỗi trang", example = "10") @RequestParam(name = "size", defaultValue = "10") int size) {
+            @Parameter(description = "Số lượng mỗi trang", example = "10") @RequestParam(name = "size", defaultValue = "10") int size) 
+    {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return userService.getUsersPage(pageable);
+        return userService.getUsersPage(pageable).map(this::toDTO);
     }
 
 
@@ -84,9 +86,10 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = APIResponse.class)))
     })
     @GetMapping("/{id}")
-    public User getUserById(@Parameter(description = "ID của user", example = "1") @PathVariable("id") Long id) {
-        return userService.getUserById(id)
+    public UserDTO getUserById(@Parameter(description = "ID của user", example = "1") @PathVariable("id") Long id) {
+        User user = userService.getUserById(id)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id " + id));
+        return toDTO(user);
     }
 
 
@@ -94,8 +97,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Thành công",
         content = @Content(schema = @Schema(implementation = User.class)))
     @GetMapping("/search")
-    public List<User> getUsersByName(@Parameter(description = "Tên user muốn tìm", example = "giang") @RequestParam("name") String name) {
-        return userService.getUsersByName(name);
+    public List<UserDTO> getUsersByName(@Parameter(description = "Tên user muốn tìm", example = "giang") @RequestParam("name") String name) {
+        return userService.getUsersByName(name).stream().map(this::toDTO).toList();
     }
 
 
@@ -107,10 +110,10 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = APIResponse.class)))
     })
     @PutMapping("/{id}")
-    public User updateUser(
+    public UserDTO updateUser(
             @Parameter(description = "ID của user", example = "1") @PathVariable("id") Long id,
             @Valid @RequestBody User input) {
-        return userService.updateUser(id, input);
+    return toDTO(userService.updateUser(id, input));
     }
 
 
@@ -135,10 +138,31 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = APIResponse.class)))
     })
     @PatchMapping("/{id}/change-password")
-    public User changePassword(
+    public UserDTO changePassword(
             @Parameter(description = "ID của user", example = "1") @PathVariable("id") Long id,
             @RequestBody PasswordChangeRequest request) {
-        return userService.changePassword(id, request.getNewPassword(), encoder);
+        return toDTO(userService.changePassword(id, request.getNewPassword(), encoder));
+        // Chuyển User entity sang UserDTO (không trả về password)
+
+    }
+    
+    
+
+    // Chuyển User entity sang UserDTO (không trả về password)
+    private UserDTO toDTO(User user) {
+        if (user == null) return null;
+        return UserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .avatarUrl(user.getAvatarUrl())
+                .isActive(user.getIsActive())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .createdBy(user.getCreatedBy())
+                .updatedBy(user.getUpdatedBy())
+                .deletedBy(user.getDeletedBy())
+                .build();
     }
 
     // DTO for password change request

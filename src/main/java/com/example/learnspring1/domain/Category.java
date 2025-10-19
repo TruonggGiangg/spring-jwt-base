@@ -2,15 +2,8 @@
 package com.example.learnspring1.domain;
 import java.time.Instant;
 
-import jakarta.annotation.PreDestroy;
 import jakarta.persistence.*;
 import lombok.*;
-
-import jakarta.persistence.EntityListeners;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
 
 @Entity
 @Table(name = "categories")
@@ -26,15 +19,11 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Category parent;
-
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 120, unique = true)
-    private String slug;
+    @Column(nullable = true)
+    private String thumbnailUrl;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
@@ -46,7 +35,6 @@ public class Category {
     @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
-
 
     @Builder.Default
     @Column(name = "updated_at")

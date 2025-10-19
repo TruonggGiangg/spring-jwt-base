@@ -23,9 +23,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user, PasswordEncoder encoder) {
-        // User newUser = new User();
+        // Kiểm tra trùng email
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email đã tồn tại");
+        }
+        // Kiểm tra trùng username
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("UserName đã tồn tại");
+        }
         user.setPassword(encoder.encode(user.getPassword())); // Encode the password
-
         return userRepository.save(user);
     }
 

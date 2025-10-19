@@ -1,4 +1,3 @@
-
 package com.example.learnspring1.utils.error;
 
 import java.util.List;

@@ -3,7 +3,6 @@ package com.example.learnspring1.domain;
 
 import java.time.Instant;
 
-import jakarta.annotation.PreDestroy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,10 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import jakarta.persistence.EntityListeners;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
 
 @Entity
 @Table(name = "users")
@@ -40,11 +36,11 @@ public class User {
     private Long id;
 
     @NotBlank(message = "username is required")
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String username;
 
     @NotBlank(message = "email is required")
-    @Column(nullable = false, length = 120)
+    @Column(nullable = false, length = 120, unique = true)
     @Email(message = "email should be valid")
     private String email;
 
